@@ -155,6 +155,7 @@ namespace EntityFramework.Areas.AdminArea.Controllers
 
             ProductUpdateVM productResult = new ProductUpdateVM
             {
+                Id = products.Id,
                 Name = products.Name,
                 Count = products.Count,
                 CategoryId = products.CategoryId,
@@ -223,6 +224,25 @@ namespace EntityFramework.Areas.AdminArea.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetDefaultImage(DefaultImageVM model)
+        {
+            var produtcImages = await _context.ProductImages.Where(m => m.ProductId == model.ProductId).ToListAsync();
+            foreach (var image in produtcImages)
+            {
+                if (image.Id == model.ImageId)
+                {
+                    image.IsMain = true;
+                }
+                else
+                {
+                    image.IsMain = false;
+                } 
+            }
+            await _context.SaveChangesAsync();
+            return Ok(produtcImages);
         }
 
         private async Task<SelectList> GetCategoriesByProduct()
